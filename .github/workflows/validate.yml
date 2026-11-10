@@ -1,0 +1,23 @@
+name: Official Hermes validation
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Validate source and dependency installation
+        run: |
+          docker run --rm --init --read-only --user 10000:10000 \
+            --cap-drop ALL --security-opt no-new-privileges:true \
+            --memory 2g --pids-limit 256 \
+            --tmpfs /tmp:rw,nosuid,exec,size=768m,uid=10000,gid=10000 \
+            --tmpfs /opt/data:rw,nosuid,size=16m,uid=10000,gid=10000 \
+            -e HOME=/tmp/check -e HERMES_HOME=/tmp/check/.hermes \
+            -e HERMES_REAL_HOME=/tmp/check \
+            -v "$PWD:/plugin:ro" \
+            --entrypoint /opt/hermes/.venv/bin/hermes \
+            nousresearch/hermes-agent@sha256:3eadce07c6cc35599ebacfa1f7d8ee06edce6374b9d07e379d6ec825ddaa7534 \
+            plugins validate /plugin --install-deps --json

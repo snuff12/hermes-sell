@@ -1,0 +1,5 @@
+[project]
+name = "hermes-sell-plugin"
+version = "0.1.0"
+requires-python = ">=3.11,<3.15"
+dependencies = ["httpx==0.28.1", "jsonschema==4.26.0", "cryptography==50.0.2", "x402[evm,httpx,extensions]==2.27.0"]
